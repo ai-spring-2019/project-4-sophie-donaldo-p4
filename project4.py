@@ -80,7 +80,7 @@ def accuracy(nn, pairs):
 ################################################################################
 ### Neural Network code goes here
 
-class NeuralNetwork:
+class NeuralNetwork():
     def __init__(self, size):
         pass
 
@@ -92,6 +92,9 @@ class NeuralNetwork:
         pass
 
     def back_propagation_leaning(self, training):
+        pass
+
+    def forward_propagate(self, x):
         pass
 
 def main():
