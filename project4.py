@@ -80,9 +80,19 @@ def accuracy(nn, pairs):
 ################################################################################
 ### Neural Network code goes here
 
+class NeuralNetwork:
+    def __init__(self, size):
+        pass
 
+    def predict_class(self):
+        pass
 
+    def get_outputs(self):
+        """ OPTIONAL """
+        pass
 
+    def back_propagation_leaning(self, training):
+        pass
 
 def main():
     header, data = read_data(sys.argv[1], ",")
