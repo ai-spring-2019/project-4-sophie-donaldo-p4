@@ -79,49 +79,33 @@ def accuracy(nn, pairs):
 
 ################################################################################
 ### Neural Network code goes here
+
+class Link: 
+    def __init__(self, weight, i, j):
+        self.weight = weight
+        self.parent = i
+        self.child = j
+
 class Node:
     """ class for each node in neural network """
     def __init__(self):
-        #weights for each link node
-        self.weights = []
         #each link node
         self.links = []
-        #reference to parent nodes for activation function
-        self.parents = []
         #activation value for self
-        self.activation_value = 1
 
     def __str__(self):
         """ string representation of node """
-        return "Weigts:\n"+\
-        str(self.weights)+\
-        "\nLinks:\n"+\
-        str(self.links)+\
-        "\nParents:\n"+\
-        str(self.parents)
-
-    def activation_function(self, index):
-        """ activation function to get the weighted value of node """
-        if len(self.parents) > 0:
-            total = 0
-            for parent in self.parents:
-                #recursively call parent activation functions
-                total += parent.activation_function(index)
-            return total * self.activation_value
-        return logistic(self.activation_value)
+        pass
 
 
 class InputNode(Node):
     def __init__(self, value):
         super().__init__()
-        self.activation_value = value
+            self._input = value
 
     def __str__(self):
         """ string representation of node """
-        return "InputNode -\nValue:\n"+\
-        str(self.value)+\
-        "\nLinks:\n"+\
-        str(self.Links)
+        pass
 
 class OutputNode(Node):
     def __init__(self, value):
@@ -130,10 +114,16 @@ class OutputNode(Node):
 
     def __str__(self):
         """ string representation of node """
-        return "OutputNode -\nValue:\n"+\
-        str(self.value)+\
-        "\nParents:\n"+\
-        str(self.parents)
+        pass
+
+    def activation_function(self, index):
+    """ activation function to get the weighted value of node """
+    if len(self.parents) > 0:
+        total = 0
+        for parent in self.parents:
+            total += logistic(parent.)
+        return total * self.activation_value
+    return logistic(self.activation_value)
 
 
 class NeuralNetwork:
