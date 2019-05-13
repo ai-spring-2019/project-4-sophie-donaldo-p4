@@ -181,6 +181,14 @@ class NeuralNetwork:
                     node.weights[i] = random.random()
         #propagate forward through network
         self.forward_propagate()
+        #errors in outputs
+        outputDiffs = []
+        for node in self.network[len(self.network)-1]:
+            outputDiffs.append()
+
+        for i in range(len(self.network)-2,0,-1):
+            pass
+
 
     def forward_propagate(self, input):
         """ forward propagation """
