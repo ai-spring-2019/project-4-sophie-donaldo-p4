@@ -111,6 +111,31 @@ class Node:
         return logistic(self.activation_value)
 
 
+class InputNode(Node):
+    def __init__(self, value):
+        super().__init__()
+        self.activation_value = value
+
+    def __str__(self):
+        """ string representation of node """
+        return "InputNode -\nValue:\n"+\
+        str(self.value)+\
+        "\nLinks:\n"+\
+        str(self.Links)
+
+class OutputNode(Node):
+    def __init__(self, value):
+        super().__init__()
+        self.activation_value = value
+
+    def __str__(self):
+        """ string representation of node """
+        return "OutputNode -\nValue:\n"+\
+        str(self.value)+\
+        "\nParents:\n"+\
+        str(self.parents)
+
+
 class NeuralNetwork:
     """ class for neural network """
     def __init__(self, nodes):
@@ -121,7 +146,12 @@ class NeuralNetwork:
             self.network.append([])
             for j in range(nodes[i]):
                 #adding nodes
-                newNode = Node()
+                if i == 0:
+                    newNode = InputNode(0)
+                elif i == len(nodes)-1:
+                    newNode = OutputNode(0)
+                else:
+                    newNode = Node()
                 if i < len(nodes)-1:
                     #giving dummy weights to nodes
                     newNode.weights = [1]*nodes[i+1]
@@ -143,10 +173,30 @@ class NeuralNetwork:
         pass
 
     def back_propagation_leaning(self, training):
-        pass
+        """ back propagation """
+        #assign random weights to nodes
+        for layer in self.network:
+            for node in layer:
+                for i in range(len(node.weights)):
+                    node.weights[i] = random.random()
+        #propagate forward through network
+        self.forward_propagate()
 
-    def forward_propagate(self, x):
-        pass
+    def forward_propagate(self, input):
+        """ forward propagation """
+        if len(input) != len(self.network[0]):
+            raise SyntaxError("input size does not match network size")
+        # set input values
+        for i in range(len(input)):
+            self.network[i].activation_value = input[i]
+        # cycle through layers
+        for i in range(1, len(self.network)):
+            for node in network[i]:
+                node.activation_value = activation_function(i)
+
+
+
+
 
 def main():
     header, data = read_data(sys.argv[1], ",")
@@ -165,7 +215,7 @@ def main():
 
     ### I expect the running of your program will work something like this;
     ### this is not mandatory and you could have something else below entirely.
-    nn = NeuralNetwork([6, 6])
+    nn = NeuralNetwork([3, 6, 3])
     # nn.back_propagation_learning(training)
 
 if __name__ == "__main__":
