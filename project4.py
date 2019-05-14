@@ -254,10 +254,31 @@ class NeuralNetwork:
         output = []
         for node in self.network[2]:
             node.activate()
-            output.append(node.get_value())
+            if node.get_value() > 0.5: 
+                output.append(1)
+            else:
+                output.append(0)
 
         return output
 
+# def cross_validation(training, k, nn):
+#     shuffled = random.shuffle(training)
+#     folds = []
+#     for dataset in shuffled:
+#         fold = []
+#         for _ in range(k):
+#             fold.append(dataset)
+#         folds.append(fold)
+
+#     errors = 0
+#     for fold in folds:
+#         folds_copy = copy.deepcopy(folds)
+#         folds_copy.remove(fold)
+#         nn.train(folds_copy)
+#         error = accuracy(nn, fold)
+#         errors += error
+
+#     return error/len(folds)
 
 
 def main():
@@ -282,6 +303,7 @@ def main():
     #print(logistic(3))
     #print(nn.forward_propagate([1, 1, 1]))
     nn.back_propagation_learning(training)
+    print(nn.forward_propagate([0, 0, 0]))
 
 if __name__ == "__main__":
     main()
