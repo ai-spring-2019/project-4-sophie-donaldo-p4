@@ -81,49 +81,59 @@ def accuracy(nn, pairs):
 ### Neural Network code goes here
 
 class Link: 
-    def __init__(self, weight, i, j):
+    def __init__(self, weight, parent, child):
         self.weight = weight
-        self.parent = i
-        self.child = j
+        self.parent = parent
+        self.child = child
+        self.value = 0
+
+    def activate(self, incoming):
+        return logistic(self.weight * incoming)
+
+    def __str__(self):
+        string = "Link between " + str(self.parent.get_num()) + " and " + str(self.child.get_num()) + " with weight of: " + str(self.weight)
+        return string
+
 
 class Node:
     """ class for each node in neural network """
-    def __init__(self):
+    def __init__(self, num):
         #each link node
         self.links = []
         #activation value for self
+        self.value = 0
+        self.num = num
 
     def __str__(self):
         """ string representation of node """
         pass
+
+    def get_value(self):
+        return self.value
+
+    def activation_function(self):
+        """ activation function to get the weighted value of node """
+        for link in incoming_links:
+            self.value += link.activate(link.parent.get_value())
+
+    def add_link(self, next_node, weight):
+        new_link = Link(weight, self, next_node)
+        print(new_link)
+        self.links.append(new_link)
+
+    def get_num(self):
+        return self.num
 
 
 class InputNode(Node):
-    def __init__(self, value):
-        super().__init__()
-            self._input = value
+    def __init__(self, num):
+        super().__init__(num)
+        self._input = 0
+        self.incoming_links = None 
 
     def __str__(self):
         """ string representation of node """
         pass
-
-class OutputNode(Node):
-    def __init__(self, value):
-        super().__init__()
-        self.activation_value = value
-
-    def __str__(self):
-        """ string representation of node """
-        pass
-
-    def activation_function(self, index):
-    """ activation function to get the weighted value of node """
-    if len(self.parents) > 0:
-        total = 0
-        for parent in self.parents:
-            total += logistic(parent.)
-        return total * self.activation_value
-    return logistic(self.activation_value)
 
 
 class NeuralNetwork:
@@ -131,29 +141,33 @@ class NeuralNetwork:
     def __init__(self, nodes):
         """ sets up orientation of nodes in network """
         self.network = []
+        count = 0
         for i in range(len(nodes)):
             #setting up network size
             self.network.append([])
             for j in range(nodes[i]):
                 #adding nodes
                 if i == 0:
-                    newNode = InputNode(0)
-                elif i == len(nodes)-1:
-                    newNode = OutputNode(0)
+                    newNode = InputNode(count)
+                    count += 1
                 else:
-                    newNode = Node()
-                if i < len(nodes)-1:
-                    #giving dummy weights to nodes
-                    newNode.weights = [1]*nodes[i+1]
+                    newNode = Node(count)
+                    count += 1
+                #if i < len(nodes)-1:
+                    # #giving dummy weights to nodes
+                    # newNode.weights = [1]*nodes[i+1]
                 self.network[i].append(newNode)
-            if i > 0:
-                for node in self.network[i-1]:
-                    #setting up links
-                    node.links = self.network[i]
-                    for link in self.network[i]:
-                        #set up reference to parents
-                        link.parents.append(node)
+        
+        # set up links - hard-coded for one hidden layer
+        for input_node in self.network[0]:
+            for hidden_node in self.network[1]:
+                #initilized with dummy weight of 1
+                input_node.add_link(hidden_node, 1)
 
+        for hidden_node in self.network[1]:
+            for output_node in self.network[2]:
+                #initilized with dummy weight of 1
+                hidden_node.add_link(output_node, 1)
 
     def predict_class(self):
         pass
@@ -162,35 +176,35 @@ class NeuralNetwork:
         """ OPTIONAL """
         pass
 
-    def back_propagation_leaning(self, training):
-        """ back propagation """
-        #assign random weights to nodes
-        for layer in self.network:
-            for node in layer:
-                for i in range(len(node.weights)):
-                    node.weights[i] = random.random()
-        #propagate forward through network
-        self.forward_propagate()
-        #errors in outputs
-        outputDiffs = []
-        for node in self.network[len(self.network)-1]:
-            outputDiffs.append()
+    # def back_propagation_leaning(self, training):
+    #     """ back propagation """
+    #     #assign random weights to nodes
+    #     for layer in self.network:
+    #         for node in layer:
+    #             for i in range(len(node.weights)):
+    #                 node.weights[i] = random.random()
+    #     #propagate forward through network
+    #     self.forward_propagate()
+    #     #errors in outputs
+    #     outputDiffs = []
+    #     for node in self.network[len(self.network)-1]:
+    #         outputDiffs.append()
 
-        for i in range(len(self.network)-2,0,-1):
-            pass
+    #     for i in range(len(self.network)-2,0,-1):
+    #         pass
 
 
-    def forward_propagate(self, input):
-        """ forward propagation """
-        if len(input) != len(self.network[0]):
-            raise SyntaxError("input size does not match network size")
-        # set input values
-        for i in range(len(input)):
-            self.network[i].activation_value = input[i]
-        # cycle through layers
-        for i in range(1, len(self.network)):
-            for node in network[i]:
-                node.activation_value = activation_function(i)
+    # def forward_propagate(self, input):
+    #     """ forward propagation """
+    #     if len(input) != len(self.network[0]):
+    #         raise SyntaxError("input size does not match network size")
+    #     # set input values
+    #     for i in range(len(input)):
+    #         self.network[i].activation_value = input[i]
+    #     # cycle through layers
+    #     for i in range(1, len(self.network)):
+    #         for node in network[i]:
+    #             node.activation_value = activation_function(i)
 
 
 
