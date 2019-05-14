@@ -128,12 +128,14 @@ class Node:
 class InputNode(Node):
     def __init__(self, num):
         super().__init__(num)
-        self._input = 0
         self.incoming_links = None 
 
     def __str__(self):
         """ string representation of node """
         pass
+
+    def get_input(self, input):
+        self.value = input
 
 
 class NeuralNetwork:
