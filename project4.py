@@ -85,10 +85,9 @@ class Link:
         self.weight = weight
         self.parent = parent
         self.child = child
-        self.value = 0
 
-    def activate(self, outgoing):
-        return logistic(self.weight * outgoing)
+    def weight_value(self, value):
+        return value * self.weight
 
     def __str__(self):
         string = "Link between " + str(self.parent.get_num()) + " and " + str(self.child.get_num()) + " with weight of: " + str(self.weight)
@@ -114,10 +113,15 @@ class Node:
     def increase_value(self, new_val):
         self.value += new_val
 
-    def activation_function(self):
+    def propogate(self):
         """ activation function to get the weighted value of node """
-        for link in links:
-            link.parent.increase_value(link.activate(self.value))
+        for link in self.links:
+            #if outgoing link
+            if link.parent.get_num() == self.num:
+                link.child.increase_value(link.weight_value(self.value))
+
+    def activate(self):
+        self.value = logistic(self.value)
 
     def add_link(self, next_node, weight):
         new_link = Link(weight, self, next_node)
@@ -137,7 +141,7 @@ class InputNode(Node):
         """ string representation of node """
         pass
 
-    def get_input(self, input_val):
+    def set_input(self, input_val):
         self.value = input_val
 
 
@@ -199,19 +203,26 @@ class NeuralNetwork:
     #         pass
 
 
-    def forward_propagate(self, input):
-        """ forward propagation """
-        if len(input) != len(self.network[0]):
-            raise SyntaxError("input size does not match network size")
-        # set input values
-        for i in range(len(input)):
-            self.network[i].activation_value = input[i]
-        # cycle through layers
-        for i in range(1, len(self.network)):
-            for node in network[i]:
-                node.activation_value = activation_function(i)
+    def forward_propagate(self, input_val):
+        """ forward propagation one input matrix"""
+        y_hat = []
+        for i in range(len(input_val)):
+            # propogate through input layer
+            self.network[0][i].set_input(input_val[i])
+            self.network[0][i].propogate()
 
+        # activate and propogate through hidden layer
+        for node in self.network[1]:
+            node.activate()
+            node.propogate()
 
+        # activate through output layer
+        output = []
+        for node in self.network[2]:
+            node.activate()
+            output.append(node.get_value())
+
+        return output
 
 
 
@@ -233,6 +244,9 @@ def main():
     ### I expect the running of your program will work something like this;
     ### this is not mandatory and you could have something else below entirely.
     nn = NeuralNetwork([3, 6, 3])
+    print(logistic(0))
+    print(logistic(3))
+    print(nn.forward_propagate([1, 1, 1]))
     # nn.back_propagation_learning(training)
 
 if __name__ == "__main__":
