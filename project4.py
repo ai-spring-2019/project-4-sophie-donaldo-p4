@@ -81,7 +81,7 @@ def accuracy(nn, pairs):
 
         # outputs = nn.get_outputs()
         # print("y =", y, ",class_pred =", class_prediction, ", outputs =", outputs)
-        print(true_positives)
+        #print(true_positives)
 
     return 1 - (true_positives / total)
 
@@ -144,7 +144,7 @@ class Node:
     def add_link(self, next_node, weight):
         """adds outgoing link"""
         new_link = Link(weight, self, next_node)
-        print(new_link)
+        #print(new_link)
         self.links.append(new_link)
 
     def get_num(self):
@@ -190,43 +190,40 @@ class NeuralNetwork:
                     # newNode.weights = [1]*nodes[i+1]
                 self.network[i].append(newNode)
 
-        # set up links - hard-coded for one hidden layer
-        for input_node in self.network[0]:
-            for hidden_node in self.network[1]:
-                #initilized with dummy weight of 1
-                input_node.add_link(hidden_node, 1)
-
-        for hidden_node in self.network[1]:
-            for output_node in self.network[2]:
-                #initilized with dummy weight of 1
-                hidden_node.add_link(output_node, 1)
+        # set up links
+        for layer in range(1, len(self.network) - 1):
+            for node in self.network[layer]:
+                for next_node in self.network[layer + 1]:
+                    #initilized with dummy weight of 1
+                    node.add_link(next_node, 1)
 
     def predict_class(self):
         """Predicts the class for classifcaiton problems"""
-        for node in self.network[2]:
-            if node.get_value == 0:
-                return 0.0
-            else:
-                return 1.0
+        output_val = self.network[len(self.network) -1][0].get_value
+        if output_val == 0:
+            return 0.0
+        else:
+            return 1.0
 
         # for 3-class dataset 
-        # for node in self.network[2]:
-        #     if node.get_value < 0.33:
-        #         return 0
-        #     elif node.get_value < 0.66:
-        #         return 1
-        #     else:
-        #         return 2
+        # 
+    #     if output_val < 0.33:
+    #         return 0
+    #     elif output_val < 0.66:
+    #         return 1
+    #     else:
+    #         return 2
 
     def back_propagation_learning(self, training):
         """ back propagation """
-        for _ in range(100):
-            #assign random weights to nodes
-            for layer in self.network:
-                for node in layer:
-                    for i in range(len(node.links)):
-                        node.links[i].weight = random.random()
+        
+        #assign random weights to nodes
+        for layer in self.network:
+            for node in layer:
+                for i in range(len(node.links)):
+                    node.links[i].weight = random.random()
             #propagate forward through network
+        for _ in range(100):
             for example in training:
                 #print(example[0][1:])
                 result = self.forward_propagate(example[0][1:])
@@ -234,7 +231,7 @@ class NeuralNetwork:
                 for i in range(len(self.network[-1])):
                     error = logistic(self.network[-1][i].value)*\
                     logistic(1-self.network[-1][i].value)*\
-                    (example[1][i]-result[i])
+                    (example[1][i]-result)
 
                     self.network[-1][i].error = error
                 for i in range(len(self.network)-2,0,-1):
@@ -257,51 +254,45 @@ class NeuralNetwork:
         y_hat = []
         for i in range(len(input_val)):
             # propogate through input layer
-            self.network[0][i].set_input(input_val[i])
-            self.network[0][i].propogate()
+            self.network[0][1].set_input(input_val[i])
+            self.network[0][1].propogate()
 
-        # activate and propogate through hidden layer
-        for node in self.network[1]:
-            node.activate()
-            node.propogate()
+        # activate and propogate through hidden layera
+        h = 1
+        while (h < (len(self.network) - 1)):
+            for node in self.network[h]:
+                node.activate()
+                node.propogate()
+                h += 1
 
-        # activate through output layer
-        output = []
-        for node in self.network[2]:
-            node.activate()
-            if node.get_value() > 0.96: 
-                output.append(1)
-            else:
-                output.append(0)
-            output.append(int(node.get_value()))
-
-        return output
+        # activate through output layer, with single node
+        self.network[len(self.network) - 1][0].activate()
+        # chosen based on sigmoid function return value
+        return self.predict_class()
 
 def cross_validation(training, k, nn):
     """This function runs a cross-validation training/testing on k-fold dataset"""
     random.shuffle(training)
     folds = []
-    for i in range(len(training)):
+    for i in range(0, len(training), 10):
         fold = []
-        for _ in range(k):
-            fold.append(training[i])
-            if i < (len(training) - 1):
-                i += 1
+        for j in range(k):
+            fold.append(training[i + j])
         folds.append(fold)
 
     errors = 0
     for fold in folds:
-        print(fold)
+        #print(fold)
         folds_copy = copy.deepcopy(folds)
         folds_copy.remove(fold)
         training_set = itertools.chain.from_iterable(folds_copy)
         nn.back_propagation_learning(training_set)
         #print("hey")
         error = accuracy(nn, fold)
-        print(error)
+        #print(error)
         errors += error
 
-    return error/len(folds)
+    return "average accuracy: " + str(errors/len(folds))
 
 
 def main():
