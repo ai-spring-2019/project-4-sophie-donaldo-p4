@@ -3,7 +3,7 @@ PLEASE DOCUMENT HERE
 Usage: python3 project3.py DATASET.csv
 """
 
-import csv, sys, random, math
+import csv, sys, random, math, copy
 
 def read_data(filename, delimiter=",", has_header=True):
     """Reads datafile using given delimiter. Returns a header and a list of
@@ -193,7 +193,11 @@ class NeuralNetwork:
                 hidden_node.add_link(output_node, 1)
 
     def predict_class(self):
-        pass
+        for node in self.network[2]:
+            if node.get_value == 0:
+                return 0.0
+            else:
+                return 1.0
 
     def get_outputs(self):
         """ OPTIONAL """
@@ -201,26 +205,23 @@ class NeuralNetwork:
 
     def back_propagation_learning(self, training):
         """ back propagation """
-        for _ in range(5):
+        for _ in range(1000):
             #assign random weights to nodes
             for layer in self.network:
                 for node in layer:
                     for i in range(len(node.links)):
                         node.links[i].weight = random.random()
             #propagate forward through network
-            print("SPOT 0")
             for example in training:
-                print(example)
+                print(example[0][1:])
                 result = self.forward_propagate(example[0][1:])
                 #errors in outputs
-                print("SPOT 1")
                 for i in range(len(self.network[-1])):
                     error = logistic(self.network[-1][i].value)*\
                     logistic(1-self.network[-1][i].value)*\
                     (example[1][i]-result[i])
 
                     self.network[-1][i].error = error
-                print("SPOT 2")
                 for i in range(len(self.network)-2,0,-1):
                     for j in range(len(self.network[i])):
                         error = logistic(self.network[i][j].value)*\
@@ -228,7 +229,6 @@ class NeuralNetwork:
                         self.network[i][j].sum_outgoing_weights()
 
                         self.network[i][j].error = error
-                print("SPOT 3")
                 #update every weight in network using deltas
                 for layer in self.network:
                     for node in layer:
@@ -258,27 +258,28 @@ class NeuralNetwork:
                 output.append(1)
             else:
                 output.append(0)
+            output.append(int(node.get_value()))
 
         return output
 
-# def cross_validation(training, k, nn):
-#     shuffled = random.shuffle(training)
-#     folds = []
-#     for dataset in shuffled:
-#         fold = []
-#         for _ in range(k):
-#             fold.append(dataset)
-#         folds.append(fold)
+def cross_validation(training, k, nn):
+    random.shuffle(training)
+    folds = []
+    for dataset in training:
+        fold = []
+        for _ in range(k):
+            fold.append(dataset)
+        folds.append(fold)
 
-#     errors = 0
-#     for fold in folds:
-#         folds_copy = copy.deepcopy(folds)
-#         folds_copy.remove(fold)
-#         nn.train(folds_copy)
-#         error = accuracy(nn, fold)
-#         errors += error
+    errors = 0
+    for fold in folds:
+        folds_copy = copy.deepcopy(folds)
+        folds_copy.remove(fold)
+        nn.back_propagation_learning(folds_copy)
+        error = accuracy(nn, fold)
+        errors += error
 
-#     return error/len(folds)
+    return error/len(folds)
 
 
 def main():
@@ -298,12 +299,12 @@ def main():
 
     ### I expect the running of your program will work something like this;
     ### this is not mandatory and you could have something else below entirely.
-    nn = NeuralNetwork([3, 6, 3])
+    nn = NeuralNetwork([2, 6, 1])
     #print(logistic(0))
     #print(logistic(3))
     #print(nn.forward_propagate([1, 1, 1]))
-    nn.back_propagation_learning(training)
-    print(nn.forward_propagate([0, 0, 0]))
+    print(cross_validation(training, 10, nn))
+
 
 if __name__ == "__main__":
     main()
