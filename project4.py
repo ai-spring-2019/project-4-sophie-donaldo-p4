@@ -208,17 +208,18 @@ class NeuralNetwork:
                     for i in range(len(node.links)):
                         node.links[i].weight = random.random()
             #propagate forward through network
+            print("SPOT 0")
             for example in training:
                 result = self.forward_propagate(example)
                 #errors in outputs
-
+                print("SPOT 1")
                 for i in range(self.network[-1]):
                     error = logistic(self.network[-1][i].value)*\
                     logistic(1-self.network[-1][i].value)*\
                     (example[1][i]-result[i])
 
                     self.network[-1][i].error = error
-
+                print("SPOT 2")
                 for i in range(len(self.network)-2,0,-1):
                     for j in range(self.network[i]):
                         error = logistic(self.network[i][j].value)*\
@@ -226,7 +227,7 @@ class NeuralNetwork:
                         self.network[i][j].sum_outgoing_weights()
 
                         self.network[i][j].error = error
-
+                print("SPOT 3")
                 #update every weight in network using deltas
                 for layer in self.network:
                     for node in layer:
@@ -276,10 +277,10 @@ def main():
     ### I expect the running of your program will work something like this;
     ### this is not mandatory and you could have something else below entirely.
     nn = NeuralNetwork([3, 6, 3])
-    print(logistic(0))
-    print(logistic(3))
-    print(nn.forward_propagate([1, 1, 1]))
-    # nn.back_propagation_learning(training)
+    #print(logistic(0))
+    #print(logistic(3))
+    #print(nn.forward_propagate([1, 1, 1]))
+    nn.back_propagation_learning(training)
 
 if __name__ == "__main__":
     main()
