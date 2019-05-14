@@ -87,8 +87,8 @@ class Link:
         self.child = child
         self.value = 0
 
-    def activate(self, incoming):
-        return logistic(self.weight * incoming)
+    def activate(self, outgoing):
+        return logistic(self.weight * outgoing)
 
     def __str__(self):
         string = "Link between " + str(self.parent.get_num()) + " and " + str(self.child.get_num()) + " with weight of: " + str(self.weight)
@@ -113,8 +113,8 @@ class Node:
 
     def activation_function(self):
         """ activation function to get the weighted value of node """
-        for link in incoming_links:
-            self.value += link.activate(link.parent.get_value())
+        for link in links:
+            link.parent.get_value() += link.activate(self.value)
 
     def add_link(self, next_node, weight):
         new_link = Link(weight, self, next_node)
@@ -134,8 +134,8 @@ class InputNode(Node):
         """ string representation of node """
         pass
 
-    def get_input(self, input):
-        self.value = input
+    def get_input(self, input_val):
+        self.value = input_val
 
 
 class NeuralNetwork:
@@ -196,17 +196,17 @@ class NeuralNetwork:
     #         pass
 
 
-    # def forward_propagate(self, input):
-    #     """ forward propagation """
-    #     if len(input) != len(self.network[0]):
-    #         raise SyntaxError("input size does not match network size")
-    #     # set input values
-    #     for i in range(len(input)):
-    #         self.network[i].activation_value = input[i]
-    #     # cycle through layers
-    #     for i in range(1, len(self.network)):
-    #         for node in network[i]:
-    #             node.activation_value = activation_function(i)
+    def forward_propagate(self, input):
+        """ forward propagation """
+        if len(input) != len(self.network[0]):
+            raise SyntaxError("input size does not match network size")
+        # set input values
+        for i in range(len(input)):
+            self.network[i].activation_value = input[i]
+        # cycle through layers
+        for i in range(1, len(self.network)):
+            for node in network[i]:
+                node.activation_value = activation_function(i)
 
 
 
