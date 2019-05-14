@@ -210,10 +210,11 @@ class NeuralNetwork:
             #propagate forward through network
             print("SPOT 0")
             for example in training:
-                result = self.forward_propagate(example)
+                print(example)
+                result = self.forward_propagate(example[0][1:])
                 #errors in outputs
                 print("SPOT 1")
-                for i in range(self.network[-1]):
+                for i in range(len(self.network[-1])):
                     error = logistic(self.network[-1][i].value)*\
                     logistic(1-self.network[-1][i].value)*\
                     (example[1][i]-result[i])
@@ -221,7 +222,7 @@ class NeuralNetwork:
                     self.network[-1][i].error = error
                 print("SPOT 2")
                 for i in range(len(self.network)-2,0,-1):
-                    for j in range(self.network[i]):
+                    for j in range(len(self.network[i])):
                         error = logistic(self.network[i][j].value)*\
                         logistic(1-self.network[i][j].value)*\
                         self.network[i][j].sum_outgoing_weights()
