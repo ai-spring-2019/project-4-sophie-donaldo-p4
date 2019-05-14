@@ -89,12 +89,14 @@ def accuracy(nn, pairs):
 ### Neural Network code goes here
 
 class Link:
+    """Class for storing attributes of links"""
     def __init__(self, weight, parent, child):
         self.weight = weight
         self.parent = parent
         self.child = child
 
     def weight_value(self, value):
+        """method for weighting a value travelling through link"""
         return value * self.weight
 
     def __str__(self):
@@ -105,9 +107,7 @@ class Link:
 class Node:
     """ class for each node in neural network """
     def __init__(self, num):
-        #each link node
         self.links = []
-        #activation value for self
         self.value = 0
         self.num = num
         self.error = 0
@@ -123,16 +123,18 @@ class Node:
         self.value += new_val
 
     def propogate(self):
-        """ activation function to get the weighted value of node """
+        """ propogates value to all child nodes"""
         for link in self.links:
             #if outgoing link
             if link.parent.get_num() == self.num:
                 link.child.increase_value(link.weight_value(self.value))
 
     def activate(self):
+        """applies application function to incoming value"""
         self.value = logistic(self.value)
 
     def sum_outgoing_weights(self):
+        """sums all outgoing weights for back_prop"""
         total = 0
         for link in self.links:
             if link.parent.get_num() == self.num:
@@ -140,6 +142,7 @@ class Node:
         return total
 
     def add_link(self, next_node, weight):
+        """adds outgoing link"""
         new_link = Link(weight, self, next_node)
         print(new_link)
         self.links.append(new_link)
@@ -150,6 +153,7 @@ class Node:
 
 
 class InputNode(Node):
+    """A Node subclass for input nodes"""
     def __init__(self, num):
         super().__init__(num)
         self.incoming_links = None
