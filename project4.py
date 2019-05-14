@@ -50,6 +50,14 @@ def logistic(x):
         return 0.0
     return 1.0 / denom
 
+def logistic_deriv(x):
+    """Logistic / sigmoid function"""
+    try:
+        denom = (math.e ** x + 1) **2
+    except OverflowError:
+        return 0.0
+    return math.e ** -x / denom
+
 def accuracy(nn, pairs):
     """Computes the accuracy of a network on given pairs. Assumes nn has a
     predict_class method, which gives the predicted class for the last run
@@ -99,6 +107,7 @@ class Node:
         #activation value for self
         self.value = 0
         self.num = num
+        self.error = 0
 
     def __str__(self):
         """ string representation of node """
@@ -119,6 +128,13 @@ class Node:
 
     def activate(self):
         self.value = logistic(self.value)
+
+    def sum_outgoing_weights(self):
+        total = 0
+        for link in self.links:
+            if link.parent.get_num() == self.num:
+                total += (link.weight * link.child.error)
+        return total
 
     def add_link(self, next_node, weight):
         new_link = Link(weight, self, next_node)
@@ -146,6 +162,7 @@ class NeuralNetwork:
     """ class for neural network """
     def __init__(self, nodes):
         """ sets up orientation of nodes in network """
+        self.errors = []
         self.network = []
         count = 0
         for i in range(len(nodes)):
@@ -182,32 +199,41 @@ class NeuralNetwork:
         """ OPTIONAL """
         pass
 
-    def back_propagation_leaning(self, training):
+    def back_propagation_learning(self, training):
         """ back propagation """
-        #assign random weights to nodes
-        for layer in self.network:
-            for node in layer:
-                for i in range(len(node.links)):
-                    node.links[i].weight = random.random()
-        #propagate forward through network
-        for example in training:
-            result = self.forward_propagate(example)
-            #errors in outputs
-            outputErrors = [[],[]]
-            for i in range(len(self.network[len(self.network)-1])):
-                error = (example[1][i]-result[i])
-                outputErrors[1].append(error)
-
-            for i in range(len(self.network)-2,0,-1):
-                for node in self.network[i]:
-                    pass
-                    #outputErrors[0].append(None)
-
-            #update every weight in network using deltas
+        for _ in range(5):
+            #assign random weights to nodes
             for layer in self.network:
                 for node in layer:
-                    for link in node.links:
-                        link.weight = link.weight #+...
+                    for i in range(len(node.links)):
+                        node.links[i].weight = random.random()
+            #propagate forward through network
+            for example in training:
+                result = self.forward_propagate(example)
+                #errors in outputs
+
+                for i in range(self.network[-1]):
+                    error = logistic(self.network[-1][i].value)*\
+                    logistic(1-self.network[-1][i].value)*\
+                    (example[1][i]-result[i])
+
+                    self.network[-1][i].error = error
+
+                for i in range(len(self.network)-2,0,-1):
+                    for j in range(self.network[i]):
+                        error = logistic(self.network[i][j].value)*\
+                        logistic(1-self.network[i][j].value)*\
+                        self.network[i][j].sum_outgoing_weights()
+
+                        self.network[i][j].error = error
+
+                #update every weight in network using deltas
+                for layer in self.network:
+                    for node in layer:
+                        for link in node.links:
+                            link.weight = link.weight + .1 * node.value * node.error
+
+        return self
 
     def forward_propagate(self, input_val):
         """ forward propagation one input matrix"""
