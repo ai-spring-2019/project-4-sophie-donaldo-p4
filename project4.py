@@ -111,10 +111,13 @@ class Node:
     def get_value(self):
         return self.value
 
+    def increase_value(self, new_val):
+        self.value += new_val
+
     def activation_function(self):
         """ activation function to get the weighted value of node """
         for link in links:
-            link.parent.get_value() += link.activate(self.value)
+            link.parent.increase_value(link.activate(self.value))
 
     def add_link(self, next_node, weight):
         new_link = Link(weight, self, next_node)
