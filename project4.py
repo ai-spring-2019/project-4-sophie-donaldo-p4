@@ -77,7 +77,7 @@ def accuracy(nn, pairs):
 ################################################################################
 ### Neural Network code goes here
 
-class Link: 
+class Link:
     def __init__(self, weight, parent, child):
         self.weight = weight
         self.parent = parent
@@ -132,7 +132,7 @@ class Node:
 class InputNode(Node):
     def __init__(self, num):
         super().__init__(num)
-        self.incoming_links = None 
+        self.incoming_links = None
 
     def __str__(self):
         """ string representation of node """
@@ -163,7 +163,7 @@ class NeuralNetwork:
                     # #giving dummy weights to nodes
                     # newNode.weights = [1]*nodes[i+1]
                 self.network[i].append(newNode)
-        
+
         # set up links - hard-coded for one hidden layer
         for input_node in self.network[0]:
             for hidden_node in self.network[1]:
@@ -182,23 +182,32 @@ class NeuralNetwork:
         """ OPTIONAL """
         pass
 
-    # def back_propagation_leaning(self, training):
-    #     """ back propagation """
-    #     #assign random weights to nodes
-    #     for layer in self.network:
-    #         for node in layer:
-    #             for i in range(len(node.weights)):
-    #                 node.weights[i] = random.random()
-    #     #propagate forward through network
-    #     self.forward_propagate()
-    #     #errors in outputs
-    #     outputDiffs = []
-    #     for node in self.network[len(self.network)-1]:
-    #         outputDiffs.append()
+    def back_propagation_leaning(self, training):
+        """ back propagation """
+        #assign random weights to nodes
+        for layer in self.network:
+            for node in layer:
+                for i in range(len(node.links)):
+                    node.links[i].weight = random.random()
+        #propagate forward through network
+        for example in training:
+            result = self.forward_propagate(example)
+            #errors in outputs
+            outputErrors = [[],[]]
+            for i in range(len(self.network[len(self.network)-1])):
+                error = (example[1][i]-result[i])
+                outputErrors[1].append(error)
 
-    #     for i in range(len(self.network)-2,0,-1):
-    #         pass
+            for i in range(len(self.network)-2,0,-1):
+                for node in self.network[i]:
+                    pass
+                    #outputErrors[0].append(None)
 
+            #update every weight in network using deltas
+            for layer in self.network:
+                for node in layer:
+                    for link in node.links:
+                        link.weight = link.weight #+...
 
     def forward_propagate(self, input_val):
         """ forward propagation one input matrix"""
