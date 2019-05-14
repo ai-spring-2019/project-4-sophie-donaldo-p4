@@ -1,5 +1,7 @@
 """
-PLEASE DOCUMENT HERE
+Project 3
+Sophie Menashi + Donald Holley 
+Project 4
 Usage: python3 project3.py DATASET.csv
 """
 
@@ -79,6 +81,7 @@ def accuracy(nn, pairs):
 
         # outputs = nn.get_outputs()
         # print("y =", y, ",class_pred =", class_prediction, ", outputs =", outputs)
+        print(true_positives)
 
     return 1 - (true_positives / total)
 
@@ -142,6 +145,7 @@ class Node:
         self.links.append(new_link)
 
     def get_num(self):
+        """returns num"""
         return self.num
 
 
@@ -155,6 +159,7 @@ class InputNode(Node):
         pass
 
     def set_input(self, input_val):
+        """sets value to input value"""
         self.value = input_val
 
 
@@ -193,15 +198,21 @@ class NeuralNetwork:
                 hidden_node.add_link(output_node, 1)
 
     def predict_class(self):
+        """Predicts the class for classifcaiton problems"""
         for node in self.network[2]:
             if node.get_value == 0:
                 return 0.0
             else:
                 return 1.0
 
-    def get_outputs(self):
-        """ OPTIONAL """
-        pass
+        # for 3-class dataset 
+        # for node in self.network[2]:
+        #     if node.get_value < 0.33:
+        #         return 0
+        #     elif node.get_value < 0.66:
+        #         return 1
+        #     else:
+        #         return 2
 
     def back_propagation_learning(self, training):
         """ back propagation """
@@ -254,7 +265,7 @@ class NeuralNetwork:
         output = []
         for node in self.network[2]:
             node.activate()
-            if node.get_value() > 0.5: 
+            if node.get_value() > 0.96: 
                 output.append(1)
             else:
                 output.append(0)
@@ -263,16 +274,20 @@ class NeuralNetwork:
         return output
 
 def cross_validation(training, k, nn):
+    """This function runs a cross-validation training/testing on k-fold dataset"""
     random.shuffle(training)
     folds = []
-    for dataset in training:
+    for i in range(len(training)):
         fold = []
         for _ in range(k):
-            fold.append(dataset)
+            fold.append(training[i])
+            if i < (len(training) - 1):
+                i += 1
         folds.append(fold)
 
     errors = 0
     for fold in folds:
+        print(fold)
         folds_copy = copy.deepcopy(folds)
         folds_copy.remove(fold)
         training_set = itertools.chain.from_iterable(folds_copy)
@@ -303,9 +318,6 @@ def main():
     ### I expect the running of your program will work something like this;
     ### this is not mandatory and you could have something else below entirely.
     nn = NeuralNetwork([2, 6, 1])
-    #print(logistic(0))
-    #print(logistic(3))
-    #print(nn.forward_propagate([1, 1, 1]))
     print(cross_validation(training, 10, nn))
 
 
