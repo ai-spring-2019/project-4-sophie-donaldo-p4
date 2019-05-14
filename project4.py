@@ -3,7 +3,7 @@ PLEASE DOCUMENT HERE
 Usage: python3 project3.py DATASET.csv
 """
 
-import csv, sys, random, math, copy
+import csv, sys, random, math, copy, itertools
 
 def read_data(filename, delimiter=",", has_header=True):
     """Reads datafile using given delimiter. Returns a header and a list of
@@ -213,7 +213,7 @@ class NeuralNetwork:
                         node.links[i].weight = random.random()
             #propagate forward through network
             for example in training:
-                print(example[0][1:])
+                #print(example[0][1:])
                 result = self.forward_propagate(example[0][1:])
                 #errors in outputs
                 for i in range(len(self.network[-1])):
@@ -275,7 +275,8 @@ def cross_validation(training, k, nn):
     for fold in folds:
         folds_copy = copy.deepcopy(folds)
         folds_copy.remove(fold)
-        nn.back_propagation_learning(folds_copy)
+        training_set = itertools.chain.from_iterable(folds_copy)
+        nn.back_propagation_learning(training_set)
         error = accuracy(nn, fold)
         errors += error
 
