@@ -72,7 +72,7 @@ def accuracy(nn, pairs):
     total = len(pairs)
 
     for (x, y) in pairs:
-        nn.forward_propagate(x)
+        nn.forward_propagate(x[1:])
         class_prediction = nn.predict_class()
         if class_prediction != y[0]:
             true_positives += 1
@@ -205,7 +205,7 @@ class NeuralNetwork:
 
     def back_propagation_learning(self, training):
         """ back propagation """
-        for _ in range(1000):
+        for _ in range(100):
             #assign random weights to nodes
             for layer in self.network:
                 for node in layer:
@@ -277,7 +277,9 @@ def cross_validation(training, k, nn):
         folds_copy.remove(fold)
         training_set = itertools.chain.from_iterable(folds_copy)
         nn.back_propagation_learning(training_set)
+        #print("hey")
         error = accuracy(nn, fold)
+        print(error)
         errors += error
 
     return error/len(folds)
